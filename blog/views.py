@@ -44,6 +44,13 @@ def serialize_tag(tag):
     }
 
 
+def serialize_tag_optimized(tag):
+    return {
+        'title': tag.title,
+        'posts_with_tag': tag.posts__count,
+    }
+
+
 def index(request):
     most_popular_posts = Post.objects.popular()[:5].prefetch_related('author', 'tags')
     most_popular_posts.fetch_with_comments_count()
@@ -78,7 +85,7 @@ def post_detail(request, slug):
 
     likes = post.likes.all()
 
-    related_tags = post.tags.all()
+    related_tags = post.tags.annotate(Count('posts'))
 
     serialized_post = {
         'title': post.title,
