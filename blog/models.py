@@ -19,15 +19,16 @@ class PostQuerySet(models.QuerySet):
         Использовать, когда необходимо одновременно отсортировать посты по популярности и получить по ним количество
         комментариев. Таким образом идет оптимизация двух вызовов annotate.
         """
-        most_popular_posts_ids = [post.id for post in self]
-        posts_with_comments = Post.objects.filter(id__in=most_popular_posts_ids).annotate(
+        posts_ids = [post.id for post in self]
+        posts_with_comments = Post.objects.filter(id__in=posts_ids).annotate(
             comments_count=Count('comments'))
         ids_and_comments = posts_with_comments.values_list('id', 'comments_count')
         count_for_id = dict(ids_and_comments)
+        posts = []
         for post in self:
             post.comments_count = count_for_id[post.id]
-        return self.values('title')
-        # return self.values('title', 'text', 'author', 'image', 'published_at', 'slug')
+            posts.append(post)
+        return posts
 
 
 class Post(models.Model):
