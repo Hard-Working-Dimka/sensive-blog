@@ -20,11 +20,11 @@ class PostQuerySet(models.QuerySet):
         комментариев. Таким образом идет оптимизация двух вызовов annotate.
         """
         posts = []
-        post_with_comments = Post.objects.filter(id__in=self).annotate(comments_count=Count('comments'))
+        posts_with_comments = Post.objects.filter(id__in=self).annotate(comments_count=Count('comments'))
         for post in self:
-            for post_count in post_with_comments:
-                if post_count.id == post.id:
-                    post.comments_count = post_count.comments_count
+            for post_with_comments in posts_with_comments:
+                if post_with_comments.id == post.id:
+                    post.comments_count = post_with_comments.comments_count
                     posts.append(post)
                     break
         return posts
