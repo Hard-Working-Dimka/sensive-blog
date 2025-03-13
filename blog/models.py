@@ -21,7 +21,7 @@ class PostQuerySet(models.QuerySet):
         """
         posts = []
         for post in self:
-            post.comments_count = Post.objects.annotate(Count('comments'))
+            post.comments_count = Post.objects.annotate(comments_count=Count('comments')).get(id=post.id).comments_count
             posts.append(post)
         return posts
 
